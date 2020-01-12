@@ -10,7 +10,7 @@ bot.on("ready", () => console.log("Online"));
 
 bot.on("message", async (msg) => {
 
-    if (msg.author.id !== "642951787892178968") return;
+    if (msg.author.id !== "Your id") return;
 
     let args = msg.content.trim().split(/\s/g);
     let cmd = args.shift().toLowerCase();

@@ -10,7 +10,7 @@ bot.on("ready", () => console.log("Online"));
 
 bot.on("message", async (msg) => {
 
-    if (msg.author.id !== "Your id") return;
+    if (msg.author.id !== bot.user.id) return;
 
     let args = msg.content.trim().split(/\s/g);
     let cmd = args.shift().toLowerCase();
@@ -18,18 +18,17 @@ bot.on("message", async (msg) => {
 
     if (cmd === "tokeninfo") {
 
+        await msg.delete()
+
         info(args.join(" "))
             .then(async res => {
                 let embed = new RichEmbed();
 
-                if (typeof res[0] == "undefined") return console.log(res) && console.log("Invalid token");
-
-
-
-
+                if (typeof res[0] == "undefined") return console.log("Invalid token");
+                if (res == "Invalid Token") return console.log("invalid boi")
 
                 embed.setThumbnail(`https://cdn.discordapp.com/avatars/${res[0].id}/${res[0].avatar}.png` || bot.user.displayAvatarURL)
-                embed.setColor("AQUA")
+                embed.setColor("BLACK")
                 embed.setDescription(`
             **id**:  __**${res[0].id}**__
             **username**:  __**${res[0].username}**__
@@ -45,14 +44,12 @@ bot.on("message", async (msg) => {
 
                 let message = await msg.channel.send(embed);
 
-                const collector = message.createReactionCollector((reaction, user) => user.id === '642951787892178968' && ["0️⃣", "1️⃣", "2️⃣", "3️⃣"].includes(reaction.emoji.name));
+                const collector = message.createReactionCollector((reaction, user) => user.id === bot.user.id && ["0️⃣", "1️⃣", "2️⃣", "3️⃣"].includes(reaction.emoji.name));
 
                 collector.on("collect", (reaction) => {
 
 
                     let emoji = reaction.emoji.name;
-
-                    console.log(emoji === "0️⃣")
 
                     switch (emoji) {
                         case "0️⃣":
@@ -154,13 +151,10 @@ bot.on("message", async (msg) => {
     }
 });
 
-// console.log(process.env)
-
 
 bot.login(process.env.TOKEN);
 
 async function info(token) {
-    // "https://gateway.discord.gg/cdn-cgi/trace", 
 
     let test = [];
 
@@ -174,16 +168,14 @@ async function info(token) {
 
         let guilds = await get("https://discordapp.com/api/v7/users/@me/guilds", { headers: { "Authorization": token } });
 
-        let friends = await get("https://discordapp.com/api/v6/users/@me/relationships", { headers: { "Authorization": token } });
+        let friends = await get("https://discordapp.com/api/v7/users/@me/relationships", { headers: { "Authorization": token } });
 
         test.push(main.data, connection.data, guilds.data, friends.data);
 
+        return test
+
     } catch (ex) {
         return "Invalid Token"
-    }
-
-    finally {
-        return test;
     }
 
 
